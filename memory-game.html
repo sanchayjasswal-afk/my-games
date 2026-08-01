@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remembering Game Studio</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      color: #f8fafc;
+      background: #07121f;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      --surface: rgba(12, 23, 42, 0.92);
+      --surface-soft: rgba(17, 30, 52, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #7c92ff;
+      --accent-strong: #4ff0d9;
+      --accent-warm: #ff7a59;
+      --accent-lilac: #9b8cff;
+      --accent-sunny: #ffd166;
+      --text-muted: #a8b4da;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(0, -12px, 0) scale(1.02); }
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.3); }
+      70% { box-shadow: 0 0 0 16px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.84) rotate(-4deg); opacity: 0.7; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    @keyframes sparkOut {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-image: radial-gradient(circle at top left, rgba(255, 122, 89, 0.18), transparent 22%), radial-gradient(circle at 85% 12%, rgba(155, 140, 255, 0.16), transparent 18%), radial-gradient(circle at 30% 80%, rgba(255, 209, 102, 0.18), transparent 20%), linear-gradient(135deg, #060c19 0%, #091424 45%, #07111f 100%);
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    body::before {
+      background: radial-gradient(circle at 20% 10%, rgba(109, 140, 255, 0.08), transparent 15%), radial-gradient(circle at 85% 25%, rgba(94, 255, 211, 0.08), transparent 16%);
+      animation: drift 8s ease-in-out infinite;
+    }
+
+    body::after {
+      background: radial-gradient(circle at 10% 70%, rgba(255, 122, 89, 0.12), transparent 16%), radial-gradient(circle at 90% 78%, rgba(255, 209, 102, 0.14), transparent 14%);
+      filter: blur(30px);
+      opacity: 0.8;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      border: none;
+      background: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(7, 17, 33, 0.88);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+    }
+
+    .header-inner {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .mark {
+      width: 2.2rem;
+      height: 2.2rem;
+      display: grid;
+      place-items: center;
+      border-radius: 0.95rem;
+      background: linear-gradient(135deg, #6d8cff, #4ff0d9);
+      color: #06111f;
+      font-size: 1rem;
+    }
+
+    .main-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .main-nav a {
+      color: #d7e1ff;
+      transition: color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .main-nav a:hover,
+    .main-nav a.active {
+      color: #fff;
+    }
+
+    .nav-toggle {
+      display: none;
+      padding: 0.8rem 1rem;
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(109, 140, 255, 0.18);
+      cursor: pointer;
+    }
+
+    .hero {
+      padding: 4rem 0 3rem;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 1fr);
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .hero-copy h1 {
+      margin: 0;
+      font-size: clamp(2.8rem, 5vw, 4.4rem);
+      letter-spacing: -0.04em;
+      transition: color 0.15s ease, text-shadow 0.15s ease;
+      color: #ff6b47;
+      text-shadow: 0 0 18px rgba(255, 110, 40, 0.65);
+    }
+
+    .hero-copy p {
+      max-width: 44rem;
+      margin: 1.4rem 0 0;
+      color: #cfd8ff;
+      font-size: 1.05rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      background: rgba(109, 140, 255, 0.12);
+      color: #cbd6ff;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero-actions {
+      display: grid;
+      grid-template-columns: repeat(2, max-content);
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      padding: 1rem 1.6rem;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #6d8cff, #4ff0d9);
+      color: #06111f;
+      box-shadow: 0 18px 40px rgba(111, 143, 255, 0.22);
+    }
+
+    .secondary-btn {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .action-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .page-section {
+      padding: 4rem 0;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: clamp(2rem, 3vw, 2.6rem);
+      transition: color 0.15s ease, text-shadow 0.15s ease;
+      color: #ff6b47;
+      text-shadow: 0 0 18px rgba(255, 110, 40, 0.65);
+    }
+
+    .section-card,
+    .feature-card,
+    .stat-card,
+    .team-card,
+    .level-card,
+    .report-card,
+    .page-panel,
+    .game-card {
+      background: rgba(12, 23, 42, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      padding: 2rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .section-card:hover,
+    .feature-card:hover,
+    .stat-card:hover,
+    .team-card:hover,
+    .level-card:hover,
+    .report-card:hover,
+    .page-panel:hover,
+    .game-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 30px 70px rgba(13, 27, 56, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .feature-grid,
+    .stats-grid,
+    .team-grid,
+    .level-grid,
+    .form-grid,
+    .game-summary {
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .feature-grid,
+    .level-grid,
+    .team-grid,
+    .form-grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .stat-card,
+    .game-card {
+      padding: 1.6rem;
+      text-align: center;
+    }
+
+    .stat-card strong,
+    .game-card strong {
+      display: block;
+      margin-top: 0.85rem;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .card-label {
+      color: #a8b4da;
+      font-size: 0.95rem;
+    }
+
+    .page-panel {
+      margin-top: 1rem;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(12, 23, 42, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th, td {
+      padding: 1rem 1.2rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    th {
+      color: #a8b5ff;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .game-card,
+    .team-card,
+    .level-card {
+      min-height: 180px;
+    }
+
+    .hero-visual,
+    .feature-card,
+    .team-card,
+    .level-card,
+    .page-panel {
+      border-radius: 28px;
+    }
+
+    .hero-visual {
+      background: linear-gradient(180deg, rgba(111, 143, 255, 0.12), rgba(255, 255, 255, 0.04));
+    }
+
+    .info-panel {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.6rem;
+    }
+
+    .game-panel {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .game-summary {
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      aspect-ratio: 1 / 1;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: linear-gradient(135deg, rgba(117, 142, 255, 0.22), rgba(255, 122, 89, 0.16));
+      color: transparent;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+      display: grid;
+      place-items: center;
+      min-height: 120px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 16px 30px rgba(0, 0, 0, 0.16);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 20px 36px rgba(0, 0, 0, 0.2);
+    }
+
+    .card.revealed {
+      background: linear-gradient(135deg, #fed7aa, #fef08a 70%, #ffd166);
+      color: #06111f;
+      transform: translateY(-2px);
+      animation: popIn 220ms ease;
+    }
+
+    .card.matched {
+      background: linear-gradient(135deg, #34d399, #10b981 70%, #059669);
+      color: #07111b;
+      pointer-events: none;
+      opacity: 0.95;
+      animation: pulseGlow 700ms ease;
+    }
+
+    .spark {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #ffd166;
+      pointer-events: none;
+      z-index: 50;
+      animation: sparkOut 900ms ease-out forwards;
+    }
+
+    .game-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .message {
+      min-height: 1.8rem;
+      font-weight: 700;
+      color: #fef3c7;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .message.success {
+      color: #bbf7d0;
+      transform: translateY(-1px);
+    }
+
+    .message.warning {
+      color: #fecaca;
+      transform: translateY(-1px);
+    }
+
+    .action-btn {
+      padding: 1rem 1.6rem;
+      border-radius: 999px;
+      font-weight: 600;
+      color: #06111f;
+      background: linear-gradient(135deg, #6d8cff, #4ff0d9);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 16px 30px rgba(111, 143, 255, 0.24);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-btn:hover,
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .purchase-btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 18px 36px rgba(111, 143, 255, 0.24);
+    }
+
+    .ripple {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.5);
+      transform: translate(-50%, -50%) scale(0);
+      animation: rippleEffect 0.6s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes rippleEffect {
+      to {
+        transform: translate(-50%, -50%) scale(22);
+        opacity: 0;
+      }
+    }
+
+    .input-field,
+    textarea {
+      width: 100%;
+      padding: 1rem 1.1rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #eef2ff;
+      margin-top: 0.5rem;
+    }
+
+    textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    .payment-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin-top: 1.2rem;
+    }
+
+    .purchase-btn {
+      padding: 0.95rem 1.4rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .purchase-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .qr-panel {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      text-align: center;
+    }
+
+    .qr-panel.open {
+      display: block;
+    }
+
+    .qr-code {
+      width: 220px;
+      height: 220px;
+      margin: 0 auto 1rem;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+      display: grid;
+      place-items: center;
+    }
+
+    .qr-code img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    footer {
+      padding: 2rem 0 3rem;
+      color: #a5b2ff;
+      text-align: center;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .footer-links a {
+      color: #d7e1ff;
+      text-decoration: none;
+    }
+
+    .section-note {
+      margin-top: 1.2rem;
+      color: #c5d0fe;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+      .header-inner {
+        grid-template-columns: 1fr auto;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .main-nav {
+        position: absolute;
+        inset: 70px 1rem auto auto;
+        width: calc(100% - 2rem);
+        padding: 1rem;
+        background: rgba(7, 17, 33, 0.98);
+        border-radius: 22px;
+        flex-direction: column;
+        transform: translateY(-20px);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      .main-nav.open {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .nav-toggle {
+        display: inline-flex;
+      }
+
+      .hero {
+        padding-top: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#home">
+        <span class="mark">R</span>
+        <span>Remembering Studio</span>
+      </a>
+      <nav class="main-nav" id="mainNav">
+        <a href="#home">Home</a>
+        <a href="#game">Game</a>
+        <a href="#features">Features</a>
+        <a href="#levels">Levels</a>
+        <a href="#stats">Stats</a>
+        <a href="#about">About</a>
+        <a href="#team">Team</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+        <a href="#careers">Careers</a>
+      </nav>
+      <button class="nav-toggle" id="navToggle">Menu</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="page-section hero container">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow">Memory game platform</span>
+          <h1>Remembering Game Studio: One HTML experience with 10 sections.</h1>
+          <p>Everything is built in a single HTML file that feels like a polished professional website. The design, game, and content are organized as one long interactive page with anchored navigation and meaningful sections.</p>
+          <div class="hero-actions">
+            <a class="primary-btn" href="#game">Play the game</a>
+            <a class="secondary-btn" href="#features">Explore features</a>
+          </div>
+        </div>
+        <div class="hero-visual section-card">
+          <h2>Single-File Experience</h2>
+          <p>This long HTML page combines the home page, game, content sections, and form interactions in one place. The result is easy to open and share without external dependencies.</p>
+          <div class="game-summary">
+            <div class="game-card"><span class="card-label">Sections</span><strong>10</strong></div>
+            <div class="game-card"><span class="card-label">Code</span><strong>Inline</strong></div>
+            <div class="game-card"><span class="card-label">Style</span><strong>Modern</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="game" class="page-section container">
+      <div class="section-title"><h2>Remembering Game</h2></div>
+      <p class="section-note">Play this memory matching game directly in the page. Match pairs, complete levels, and keep track of your progress with a polished interface.</p>
+      <div class="page-panel game-panel">
+        <div class="game-summary">
+          <div class="game-card"><span class="card-label">Level</span><strong id="level">1</strong></div>
+          <div class="game-card"><span class="card-label">Moves</span><strong id="moves">0</strong></div>
+          <div class="game-card"><span class="card-label">Matches</span><strong id="matches">0 / 8</strong></div>
+        </div>
+        <div id="board" class="game-board"></div>
+        <p class="message" id="message">Find all matching pairs.</p>
+        <div class="game-actions">
+          <button class="action-btn" id="restart" type="button">Restart</button>
+          <button class="action-btn" id="nextLevel" type="button">Next Level</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="page-section container">
+      <div class="section-title"><h2>Features</h2></div>
+      <div class="feature-grid">
+        <div class="feature-card"><h3>Professional Design</h3><p>Modern gradients, glassy panels, and premium typography make the page feel like a high-end product site.</p></div>
+        <div class="feature-card"><h3>Fully Anchored Navigation</h3><p>Quickly jump between sections with in-page links that look and behave like a multi-page site.</p></div>
+        <div class="feature-card"><h3>Single File Convenience</h3><p>All page logic, styles, and content are included in one HTML file for portability and simplicity.</p></div>
+        <div class="feature-card"><h3>Responsive Layout</h3><p>The page adapts to large screens and mobile devices with a clean grid and readable spacing.</p></div>
+      </div>
+    </section>
+
+    <section id="levels" class="page-section container">
+      <div class="section-title"><h2>Levels</h2></div>
+      <p class="section-note">Each level increases the challenge with more card pairs. The game starts easy and becomes more demanding as you progress.</p>
+      <div class="level-grid">
+        <div class="level-card"><h3>Level 1</h3><p>8 cards, easy pace, perfect for warming up and learning the mechanics.</p></div>
+        <div class="level-card"><h3>Level 2</h3><p>10 cards with tighter matching sequences and a stronger memory push.</p></div>
+        <div class="level-card"><h3>Level 3</h3><p>12 cards with more pair combinations and a growing sense of accomplishment.</p></div>
+        <div class="level-card"><h3>Level 4</h3><p>14 cards adds complexity while keeping the layout clean and clear.</p></div>
+        <div class="level-card"><h3>Level 5</h3><p>16 cards to challenge pattern recognition and recall speed.</p></div>
+        <div class="level-card"><h3>Level 6+</h3><p>Advanced levels combine speed, precision, and sustained focus.</p></div>
+      </div>
+    </section>
+
+    <section id="stats" class="page-section container">
+      <div class="section-title"><h2>Stats</h2></div>
+      <p class="section-note">Track the details of each session and review your performance at a glance.</p>
+      <div class="stats-grid">
+        <div class="stat-card"><span class="card-label">Best Score</span><strong>54</strong></div>
+        <div class="stat-card"><span class="card-label">Levels Completed</span><strong>6</strong></div>
+        <div class="stat-card"><span class="card-label">Average Moves</span><strong>18</strong></div>
+        <div class="stat-card"><span class="card-label">Time Played</span><strong>42m</strong></div>
+      </div>
+      <div class="table-wrapper page-panel">
+        <table>
+          <thead>
+            <tr><th>Session</th><th>Level</th><th>Moves</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Today</td><td>4</td><td>16</td><td>Completed</td></tr>
+            <tr><td>Yesterday</td><td>3</td><td>18</td><td>Completed</td></tr>
+            <tr><td>Last Week</td><td>5</td><td>20</td><td>Completed</td></tr>
+            <tr><td>Archive</td><td>2</td><td>24</td><td>Completed</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="about" class="page-section container">
+      <div class="section-title"><h2>About</h2></div>
+      <div class="page-panel">
+        <p>The Remembering Game Studio page demonstrates how a polished product website can be created entirely inside a single HTML document. This version includes a full memory game experience, navigation, content sections, and visuals that feel crafted by a design studio.</p>
+        <div class="info-panel">
+          <div class="section-card"><h3>Mission</h3><p>Make memory practice feel premium through refined visuals, intuitive interactions, and clear progress tracking.</p></div>
+          <div class="section-card"><h3>Approach</h3><p>Use a unified visual system with strong hierarchy, consistent spacing, and accessible colors.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="team" class="page-section container">
+      <div class="section-title"><h2>Team</h2></div>
+      <p class="section-note">A professional product experience is driven by dedicated roles and collaboration.</p>
+      <div class="team-grid">
+        <div class="team-card"><h3>Alex Morgan</h3><p>Lead product designer creating game systems and polished interfaces.</p></div>
+        <div class="team-card"><h3>Jamie Park</h3><p>Brand strategist defining the visual tone and storytelling approach.</p></div>
+        <div class="team-card"><h3>Samira Lee</h3><p>Front-end developer implementing responsive interactions and animations.</p></div>
+        <div class="team-card"><h3>Noah Patel</h3><p>Analytics lead optimizing user engagement and progression metrics.</p></div>
+      </div>
+    </section>
+
+    <section id="pricing" class="page-section container">
+      <div class="section-title"><h2>Pricing</h2></div>
+      <p class="section-note">Choose a premium plan for real value: pay securely using Google Pay, PhonePe, Paytm, or any UPI app.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Free</h3>
+          <p>Access the starter game with up to six levels, simple progress tracking, and a clean interface.</p>
+          <p class="card-label">Price</p>
+          <strong>₹0</strong>
+        </div>
+        <div class="feature-card">
+          <h3>Pro</h3>
+          <p>Unlock extended levels, advanced stat cards, and premium gameplay features.</p>
+          <p class="card-label">Price</p>
+          <strong>₹2,999</strong>
+          <p class="section-note">One-time purchase for enhanced memory training.</p>
+          <div class="payment-actions">
+            <button class="purchase-btn" type="button" data-plan="Pro" data-price="2999">Buy Pro</button>
+          </div>
+        </div>
+        <div class="feature-card">
+          <h3>Studio</h3>
+          <p>Get full level access, priority updates, custom themes, and the complete analytics dashboard.</p>
+          <p class="card-label">Price</p>
+          <strong>₹5,999</strong>
+          <p class="section-note">Best for serious learners who want the full pro studio experience.</p>
+          <div class="payment-actions">
+            <button class="purchase-btn" type="button" data-plan="Studio" data-price="5999">Buy Studio</button>
+          </div>
+        </div>
+      </div>
+      <div class="section-card payment-panel">
+        <h3>UPI Payment</h3>
+        <p class="section-note">Scan the QR code or copy the UPI ID in Google Pay, PhonePe, Paytm, or any UPI app to complete your purchase.</p>
+        <p class="card-label">UPI ID</p>
+        <strong id="upiIdText">remembering@paytm</strong>
+        <div class="payment-actions">
+          <button class="primary-btn" type="button" id="showQrBtn">Show QR Code</button>
+          <button class="secondary-btn" type="button" id="copyUpiBtn">Copy UPI ID</button>
+        </div>
+        <div class="qr-panel" id="qrPanel" aria-hidden="true">
+          <div class="qr-code">
+            <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=remembering%40paytm&pn=Remembering%20Game%20Studio&cu=INR" alt="UPI QR Code" />
+          </div>
+          <p>Scan this QR with Google Pay or any UPI app to pay.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="page-section container">
+      <div class="section-title"><h2>Contact</h2></div>
+      <p class="section-note">Interested in this game or want a custom version? Send a message below.</p>
+      <div class="form-grid">
+        <div class="section-card">
+          <label>Name</label>
+          <input class="input-field" type="text" placeholder="Your name" />
+        </div>
+        <div class="section-card">
+          <label>Email</label>
+          <input class="input-field" type="email" placeholder="Your email" />
+        </div>
+        <div class="section-card" style="grid-column: span 2;">
+          <label>Message</label>
+          <textarea placeholder="Your message"></textarea>
+        </div>
+      </div>
+      <button class="primary-btn" type="button">Send Message</button>
+      <div class="section-card" style="margin-top: 1.5rem; background: rgba(79, 240, 217, 0.08); border-color: rgba(79, 240, 217, 0.18);">
+        <h3>Contact Phone</h3>
+        <p style="color: #e2f0ff; font-size: 1.05rem;">Call or WhatsApp us at <strong>9674741199</strong></p>
+        <h3 style="margin-top: 1rem;">Email</h3>
+        <p style="color: #e2f0ff; font-size: 1.05rem;"><strong>sanchayalwaysprobizthebest@gmail.com</strong></p>
+      </div>
+    </section>
+
+    <section id="careers" class="page-section container">
+      <div class="section-title"><h2>Careers</h2></div>
+      <p class="section-note">Join a team focused on creating memorable game experiences with premium polish.</p>
+      <div class="feature-grid">
+        <div class="feature-card"><h3>UX Designer</h3><p>Design interface flows, user journeys, and playful visual systems.</p></div>
+        <div class="feature-card"><h3>Front-End Developer</h3><p>Build responsive interactive pages with fast, smooth animations and strong structure.</p></div>
+        <div class="feature-card"><h3>Growth Analyst</h3><p>Analyze metrics, optimize engagement, and craft conversion strategies.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container">
+    <p>Remembering Game Studio — One HTML page, ten sections, and a polished experience.</p>
+    <div class="footer-links">
+      <a href="#home">Home</a>
+      <a href="#game">Play</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </footer>
+
+  <script>
+    const navToggle = document.getElementById('navToggle');
+    const mainNav = document.getElementById('mainNav');
+    const navLinks = document.querySelectorAll('.main-nav a');
+    const sections = document.querySelectorAll('section[id]');
+
+    navToggle.addEventListener('click', () => {
+      mainNav.classList.toggle('open');
+    });
+
+    function updateActiveNav() {
+      const scrollPos = window.scrollY + window.innerHeight / 3;
+      sections.forEach((section) => {
+        const top = section.offsetTop;
+        const height = section.offsetHeight;
+        const id = section.getAttribute('id');
+        if (scrollPos >= top && scrollPos < top + height) {
+          navLinks.forEach((link) => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+          });
+        }
+      });
+    }
+
+    window.addEventListener('scroll', updateActiveNav);
+    updateActiveNav();
+
+    const board = document.getElementById('board');
+    const movesLabel = document.getElementById('moves');
+    const matchesLabel = document.getElementById('matches');
+    const levelLabel = document.getElementById('level');
+    const messageEl = document.getElementById('message');
+    const restartButton = document.getElementById('restart');
+    const nextLevelButton = document.getElementById('nextLevel');
+
+    let cards = [];
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let moves = 0;
+    let matches = 0;
+    let level = 1;
+
+    const emojiSet = ['🍎', '🍌', '🍇', '🍒', '🍋', '🥝', '🍓', '🍍', '🥑', '🍉', '🍑', '🥥', '🍊', '🍐', '🍏'];
+
+    function createDeck(pairCount) {
+      const selected = emojiSet.slice(0, pairCount);
+      const deck = [...selected, ...selected];
+      return deck.sort(() => Math.random() - 0.5);
+    }
+
+    function updateStats() {
+      movesLabel.textContent = moves;
+      matchesLabel.textContent = `${matches} / ${cards.length / 2}`;
+      levelLabel.textContent = level;
+    }
+
+    function setMessage(text, tone = 'info') {
+      messageEl.textContent = text;
+      messageEl.className = `message ${tone}`;
+    }
+
+    function resetBoard() {
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+    }
+
+    function revealCard(card) {
+      card.classList.add('revealed');
+      card.textContent = card.dataset.value;
+    }
+
+    function hideCard(card) {
+      card.classList.remove('revealed');
+      card.textContent = '';
+    }
+
+    function disableMatched(card) {
+      card.classList.add('matched');
+    }
+
+    function burstCelebration(card) {
+      const rect = card.getBoundingClientRect();
+      const colors = ['#fde68a', '#f9a8d4', '#7dd3fc', '#fda4af', '#c4b5fd'];
+
+      for (let i = 0; i < 14; i += 1) {
+        const spark = document.createElement('span');
+        spark.className = 'spark';
+        spark.style.left = `${rect.left + rect.width / 2}px`;
+        spark.style.top = `${rect.top + rect.height / 2}px`;
+        spark.style.setProperty('--dx', `${(Math.random() - 0.5) * 220}px`);
+        spark.style.setProperty('--dy', `${(Math.random() - 0.5) * 220}px`);
+        spark.style.background = colors[i % colors.length];
+        document.body.appendChild(spark);
+        setTimeout(() => spark.remove(), 900);
+      }
+    }
+
+    function handleCardClick(event) {
+      const card = event.currentTarget;
+      if (lockBoard || card === firstCard || card.classList.contains('matched')) return;
+
+      revealCard(card);
+      if (!firstCard) {
+        firstCard = card;
+        return;
+      }
+
+      secondCard = card;
+      lockBoard = true;
+      moves += 1;
+      updateStats();
+
+      if (firstCard.dataset.value === secondCard.dataset.value) {
+        matches += 1;
+        disableMatched(firstCard);
+        disableMatched(secondCard);
+        burstCelebration(firstCard);
+        burstCelebration(secondCard);
+        setMessage('Nice! You found a match.', 'success');
+        resetBoard();
+
+        if (matches === cards.length / 2) {
+          setMessage('Well done! Level complete. Click Next Level or Restart.', 'success');
+        }
+      } else {
+        setMessage('Try again...', 'warning');
+        setTimeout(() => {
+          hideCard(firstCard);
+          hideCard(secondCard);
+          resetBoard();
+        }, 900);
+      }
+    }
+
+    function createBoard(pairCount) {
+      board.innerHTML = '';
+      const deck = createDeck(pairCount);
+      cards = deck.map((value) => {
+        const button = document.createElement('button');
+        button.className = 'card';
+        button.type = 'button';
+        button.dataset.value = value;
+        button.addEventListener('click', handleCardClick);
+        board.appendChild(button);
+        return button;
+      });
+    }
+
+    function startLevel() {
+      const pairCount = Math.min(8, 4 + level);
+      matches = 0;
+      moves = 0;
+      setMessage('Find all matching pairs.');
+      createBoard(pairCount);
+      updateStats();
+      resetBoard();
+    }
+
+    restartButton.addEventListener('click', startLevel);
+    nextLevelButton.addEventListener('click', () => {
+      if (matches === cards.length / 2) {
+        level += 1;
+        startLevel();
+      } else {
+        setMessage('Finish the level before moving on.', 'warning');
+      }
+    });
+
+    document.querySelectorAll('.primary-btn, .secondary-btn, .action-btn, .purchase-btn').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        const rect = button.getBoundingClientRect();
+        ripple.style.left = `${event.clientX - rect.left}px`;
+        ripple.style.top = `${event.clientY - rect.top}px`;
+        button.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+      });
+    });
+
+    const showQrBtn = document.getElementById('showQrBtn');
+    const copyUpiBtn = document.getElementById('copyUpiBtn');
+    const qrPanel = document.getElementById('qrPanel');
+    const upiId = 'remembering@paytm';
+
+    showQrBtn.addEventListener('click', () => {
+      qrPanel.classList.toggle('open');
+      qrPanel.setAttribute('aria-hidden', qrPanel.classList.contains('open') ? 'false' : 'true');
+      showQrBtn.textContent = qrPanel.classList.contains('open') ? 'Hide QR Code' : 'Show QR Code';
+    });
+
+    copyUpiBtn.addEventListener('click', async () => {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(upiId);
+        alert('UPI ID copied: ' + upiId);
+      } else {
+        alert('Copy this UPI ID: ' + upiId);
+      }
+    });
+
+    const purchaseButtons = document.querySelectorAll('.purchase-btn');
+    purchaseButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const plan = button.dataset.plan;
+        const price = button.dataset.price;
+        alert(`Selected ${plan} plan for ₹${price}. Scroll down to pay with UPI.`);
+        document.getElementById('showQrBtn').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    const headingElements = document.querySelectorAll('h1, .section-title h2');
+
+    function getRandomColor() {
+      const palette = [
+        'hsl(8, 100%, 56%)',
+        'hsl(16, 100%, 60%)',
+        'hsl(24, 100%, 58%)',
+        'hsl(30, 100%, 62%)',
+        'hsl(348, 100%, 58%)',
+        'hsl(12, 100%, 64%)',
+        'hsl(22, 100%, 60%)',
+        'hsl(40, 100%, 60%)'
+      ];
+      return palette[Math.floor(Math.random() * palette.length)];
+    }
+
+    function updateHeadingColor(element) {
+      element.style.color = getRandomColor();
+      element.style.textShadow = `0 0 12px ${element.style.color}`;
+    }
+
+    headingElements.forEach((heading) => {
+      let hoverInterval = null;
+
+      const startHoverColorChange = () => {
+        if (hoverInterval) return;
+        hoverInterval = setInterval(() => updateHeadingColor(heading), 1000);
+      };
+
+      const stopHoverColorChange = () => {
+        if (hoverInterval) {
+          clearInterval(hoverInterval);
+          hoverInterval = null;
+        }
+      };
+
+      heading.addEventListener('mouseenter', startHoverColorChange);
+      heading.addEventListener('mousemove', startHoverColorChange);
+      heading.addEventListener('mouseleave', stopHoverColorChange);
+      heading.addEventListener('mouseout', stopHoverColorChange);
+    });
+
+    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || /Mobile|Android|iP(hone|ad|od)/i.test(navigator.userAgent);
+    if (isTouchDevice) {
+      setInterval(() => {
+        headingElements.forEach(updateHeadingColor);
+      }, 1000);
+    }
+
+    startLevel();
+  </script>
+</body>
+</html>

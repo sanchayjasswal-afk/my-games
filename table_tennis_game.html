@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Table Tennis Arcade</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #111, #222);
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .game-wrap {
+      text-align: center;
+      width: min(100%, 920px);
+      margin: 0 auto;
+      position: relative;
+    }
+    canvas {
+      width: 100%;
+      max-width: 900px;
+      height: auto;
+      border: 4px solid white;
+      border-radius: 10px;
+      background: black;
+      box-shadow: 0 0 25px rgba(255,255,255,0.2);
+      touch-action: none;
+    }
+    .info {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #ddd;
+    }
+    .touch-controls {
+      display: none;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 5;
+    }
+    .touch-btn {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 14px;
+      padding: 14px 18px;
+      min-width: 120px;
+      font-size: 16px;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .touch-btn:active {
+      background: rgba(255,255,255,0.2);
+    }
+    .space-btn {
+      min-width: 260px;
+      padding: 16px 0;
+      border-radius: 24px;
+      font-size: 18px;
+      font-weight: bold;
+      background: #fff;
+      color: #222;
+      border: 2px solid #fff;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .space-btn:active {
+      background: #f0f0f0;
+    }
+    .overlay {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 140px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0,0,0,0.65);
+      color: white;
+      font-size: 24px;
+      border-radius: 10px;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .difficulty-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    .difficulty-btn {
+      background: #222;
+      color: white;
+      border: 2px solid white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .difficulty-btn.active {
+      background: #4fc3f7;
+      color: black;
+      border-color: #4fc3f7;
+      font-weight: bold;
+    }
+    .hidden { display: none; }
+    @media (hover: none) and (pointer: coarse) {
+      .touch-controls {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrap" style="position: relative;">
+    <canvas id="gameCanvas" width="900" height="600"></canvas>
+    <div id="overlay" class="overlay">
+      <div>
+        <h2>Table Tennis Arcade</h2>
+        <p>Use W/S or ↑/↓ on desktop, or tap the buttons below on mobile.</p>
+        <p>Survive 3 lives, beat 10 levels, and face the boss every 5th level.</p>
+        <div class="difficulty-buttons">
+          <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+          <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+          <button class="difficulty-btn" data-difficulty="very-hard">Very Hard</button>
+        </div>
+        <p>Press Enter to start</p>
+        <button id="startButton" class="difficulty-btn" style="margin-top: 8px;">Start Game</button>
+        <button id="spaceButton" class="space-btn">SPACE</button>
+      </div>
+    </div>
+    <div class="info">Lives: <span id="lives">3</span> · Level: <span id="level">1</span> · Score: <span id="score">0</span> · Difficulty: <span id="difficulty">Easy</span></div>
+    <div class="touch-controls">
+      <button id="touchUp" class="touch-btn">Move Up</button>
+      <button id="touchSpace" class="touch-btn">SPACE</button>
+      <button id="touchDown" class="touch-btn">Move Down</button>
+      <button id="touchRestart" class="touch-btn">Restart</button>
+    </div>
+    <div class="info" style="margin-top: 4px; font-size: 14px; color: #ccc;">
+      Mobile keys: tap <strong>Move Up</strong> and <strong>Move Down</strong> to play.
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const overlay = document.getElementById('overlay');
+    const livesEl = document.getElementById('lives');
+    const levelEl = document.getElementById('level');
+    const scoreEl = document.getElementById('score');
+    const difficultyEl = document.getElementById('difficulty');
+    const startButton = document.getElementById('startButton');
+    const spaceButton = document.getElementById('spaceButton');
+    const restartButton = document.getElementById('touchRestart');
+    const touchControls = document.querySelector('.touch-controls');
+    const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+    if (!isMobile && touchControls) {
+      touchControls.style.display = 'none';
+    }
+
+    const player = { x: 40, y: 240, w: 24, h: 120 };
+    const bot = { x: 836, y: 240, w: 24, h: 120 };
+    const ball = { x: 450, y: 300, r: 10 };
+    const bomb = { x: 0, y: 0, r: 12, active: false, timer: 0 };
+
+    let lives = 3;
+    let level = 1;
+    let score = 0;
+    let running = false;
+    let gameOver = false;
+    let won = false;
+    let ballVx = 0;
+    let ballVy = 0;
+    let difficulty = 'easy';
+    const keys = {};
+    const touchButtons = { up: false, down: false, space: false };
+    const difficultySettings = {
+      easy: { label: 'Easy', speedMul: 0.95, botMul: 0.9 },
+      medium: { label: 'Medium', speedMul: 1.15, botMul: 1.05 },
+      'very-hard': { label: 'Very Hard', speedMul: 1.35, botMul: 1.25 }
+    };
+
+    function setDifficulty(mode) {
+      difficulty = mode;
+      document.querySelectorAll('.difficulty-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.difficulty === mode);
+      });
+      updateHud();
+    }
+
+    function resetBall() {
+      ball.x = canvas.width / 2;
+      ball.y = canvas.height / 2;
+      const direction = Math.random() < 0.5 ? -1 : 1;
+      const settings = difficultySettings[difficulty];
+      let speed = (6 + level * 1.1) * settings.speedMul;
+      if (level % 5 === 0) speed += 1.7 * settings.speedMul;
+      ballVx = speed * direction;
+      ballVy = (Math.random() * 6 - 3) + level * 0.08;
+      if (ballVy === 0) ballVy = 2;
+    }
+
+    function spawnBomb() {
+      bomb.active = true;
+      bomb.x = Math.random() * (canvas.width - 120) + 60;
+      bomb.y = Math.random() * (canvas.height - 120) + 60;
+      bomb.timer = 0;
+    }
+
+    function nextLevel() {
+      if (level < 10) {
+        level += 1;
+        score = 0;
+        resetBall();
+      } else {
+        won = true;
+        running = false;
+        overlay.classList.remove('hidden');
+        overlay.innerHTML = '<div><h2>You Win!</h2><p>You beat all 10 levels and the final boss.</p><p>Press Enter to play again</p></div>';
+      }
+      updateHud();
+    }
+
+    function updateHud() {
+      livesEl.textContent = lives;
+      levelEl.textContent = level;
+      scoreEl.textContent = score;
+      difficultyEl.textContent = difficultySettings[difficulty].label;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function rectCircleCollide(rect, circle) {
+      const closestX = clamp(circle.x, rect.x, rect.x + rect.w);
+      const closestY = clamp(circle.y, rect.y, rect.y + rect.h);
+      const dx = circle.x - closestX;
+      const dy = circle.y - closestY;
+      return dx * dx + dy * dy <= circle.r * circle.r;
+    }
+
+    function update() {
+      if (!running) return;
+
+      if (keys['w'] || keys['ArrowUp'] || touchButtons.up) player.y -= 8 + level * 0.4;
+      if (keys['s'] || keys['ArrowDown'] || touchButtons.down) player.y += 8 + level * 0.4;
+      if (touchButtons.space && (!running || gameOver || won)) {
+        startGame();
+      }
+      player.y = clamp(player.y, 0, canvas.height - player.h);
+
+      const settings = difficultySettings[difficulty];
+      const botSpeed = (4.5 + level * 0.65) * settings.botMul;
+      if (bomb.active) {
+        bomb.timer += 1;
+        if (bomb.timer > 280) {
+          bomb.active = false;
+        }
+      }
+      if (!bomb.active && Math.random() < 0.0025) {
+        spawnBomb();
+      }
+      if (ball.x > canvas.width / 2 + 40) {
+        if (bot.y + bot.h / 2 < ball.y) bot.y += botSpeed;
+        else if (bot.y + bot.h / 2 > ball.y) bot.y -= botSpeed;
+      }
+      bot.y = clamp(bot.y, 0, canvas.height - bot.h);
+
+      ball.x += ballVx;
+      ball.y += ballVy;
+
+      if (ball.y - ball.r <= 0 || ball.y + ball.r >= canvas.height) {
+        ballVy *= -1;
+        ball.y = clamp(ball.y, ball.r, canvas.height - ball.r);
+      }
+
+      if (rectCircleCollide(player, ball) && ballVx < 0) {
+        ball.x = player.x + player.w + ball.r;
+        ballVx *= -1.04;
+        ballVy += (ball.y - (player.y + player.h / 2)) / 120;
+        ballVy = clamp(ballVy, -8, 8);
+      }
+
+      if (rectCircleCollide(bot, ball) && ballVx > 0) {
+        ball.x = bot.x - ball.r;
+        ballVx *= -1.04;
+        ballVy += (ball.y - (bot.y + bot.h / 2)) / 120;
+        ballVy = clamp(ballVy, -8, 8);
+      }
+
+      if (bomb.active && Math.abs(ball.x - bomb.x) < 24 && Math.abs(ball.y - bomb.y) < 24) {
+        bomb.active = false;
+        lives = Math.max(1, lives - 1);
+        updateHud();
+      }
+
+      if (ball.x + ball.r < 0) {
+        lives -= 1;
+        score = 0;
+        updateHud();
+        if (lives <= 0) {
+          gameOver = true;
+          running = false;
+          overlay.classList.remove('hidden');
+          overlay.innerHTML = '<div><h2>Game Over</h2><p>Press Enter to restart</p></div>';
+        } else {
+          resetBall();
+        }
+      }
+
+      if (ball.x - ball.r > canvas.width) {
+        score += 1;
+        updateHud();
+        if (score >= 3) {
+          nextLevel();
+        } else {
+          resetBall();
+        }
+      }
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, 0);
+      ctx.lineTo(canvas.width / 2, canvas.height);
+      ctx.stroke();
+    }
+
+    function drawPaddle(x, y, w, h, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, w, h);
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffd54f';
+      ctx.fill();
+    }
+
+    function drawBomb() {
+      if (!bomb.active) return;
+      ctx.beginPath();
+      ctx.arc(bomb.x, bomb.y, bomb.r, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff4d4d';
+      ctx.fill();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(bomb.x - 6, bomb.y - 2);
+      ctx.lineTo(bomb.x + 6, bomb.y + 2);
+      ctx.moveTo(bomb.x, bomb.y - 8);
+      ctx.lineTo(bomb.x, bomb.y + 8);
+      ctx.stroke();
+    }
+
+    function drawHud() {
+      ctx.font = '24px Arial';
+      ctx.fillStyle = 'white';
+      ctx.fillText(`Lives: ${lives}`, 20, 30);
+      ctx.fillText(`Level: ${level}`, 220, 30);
+      ctx.fillText(`Score: ${score}`, 420, 30);
+      if (level % 5 === 0) {
+        ctx.fillStyle = '#ff6b6b';
+        ctx.fillText('BOSS LEVEL', 620, 30);
+      }
+    }
+
+    function draw() {
+      drawBackground();
+      drawPaddle(player.x, player.y, player.w, player.h, '#4fc3f7');
+      drawPaddle(bot.x, bot.y, bot.w, bot.h, '#ff6b6b');
+      drawBall();
+      drawBomb();
+      drawHud();
+      if (!running) {
+        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      lives = 3;
+      level = 1;
+      score = 0;
+      gameOver = false;
+      won = false;
+      running = true;
+      player.y = 240;
+      bot.y = 240;
+      bomb.active = false;
+      resetBall();
+      updateHud();
+      overlay.classList.add('hidden');
+    }
+
+    document.querySelectorAll('.difficulty-btn').forEach((btn) => {
+      btn.addEventListener('click', () => setDifficulty(btn.dataset.difficulty));
+    });
+
+    function bindTouchControl(id, key) {
+      const btn = document.getElementById(id);
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        touchButtons[key] = true;
+      });
+      btn.addEventListener('pointerup', (e) => {
+        e.preventDefault();
+        touchButtons[key] = false;
+      });
+      btn.addEventListener('pointercancel', () => { touchButtons[key] = false; });
+      btn.addEventListener('pointerleave', () => { touchButtons[key] = false; });
+    }
+
+    bindTouchControl('touchUp', 'up');
+    bindTouchControl('touchSpace', 'space');
+    bindTouchControl('touchDown', 'down');
+    bindTouchControl('touchRestart', 'restart');
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'w' || e.key === 's' || e.key === 'W' || e.key === 'S') {
+        e.preventDefault();
+      }
+      keys[e.key] = true;
+      if (e.key === 'Enter' && (!running || gameOver || won)) {
+        e.preventDefault();
+        startGame();
+      }
+    });
+
+    if (startButton) {
+      startButton.addEventListener('click', () => startGame());
+    }
+    if (spaceButton) {
+      spaceButton.addEventListener('click', () => startGame());
+    }
+    if (restartButton) {
+      restartButton.addEventListener('click', () => startGame());
+    }
+
+    window.addEventListener('keyup', (e) => {
+      keys[e.key] = false;
+    });
+
+    updateHud();
+    resetBall();
+    loop();
+  </script>
+</body>
+</html>

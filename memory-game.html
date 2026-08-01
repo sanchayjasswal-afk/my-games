@@ -79,6 +79,27 @@
       opacity: 0.8;
     }
 
+    .designer-credit {
+      position: fixed;
+      left: 1rem;
+      bottom: 1rem;
+      z-index: 60;
+      padding: 0.8rem 1rem;
+      border-radius: 999px;
+      background: rgba(7, 17, 33, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fef3c7;
+      font-size: 0.95rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+      pointer-events: none;
+      backdrop-filter: blur(10px);
+      animation: popIn 400ms ease;
+    }
+
+    .designer-credit strong {
+      color: #7dd3fc;
+    }
+
     img {
       max-width: 100%;
       display: block;
@@ -666,6 +687,8 @@
     </div>
   </header>
 
+  <div class="designer-credit" id="designerCredit">Designed by <strong>Sanchay Jasswal</strong></div>
+
   <main>
     <section id="home" class="page-section hero container">
       <div class="hero-inner">
@@ -1082,6 +1105,17 @@
         alert(`Selected ${plan} plan for ₹${price}. Scroll down to pay with UPI.`);
         document.getElementById('showQrBtn').scrollIntoView({ behavior: 'smooth' });
       });
+    });
+
+    const designerCredit = document.getElementById('designerCredit');
+    window.addEventListener('load', () => {
+      designerCredit.animate(
+        [
+          { opacity: 0, transform: 'translateY(10px)' },
+          { opacity: 1, transform: 'translateY(0)' }
+        ],
+        { duration: 500, easing: 'ease-out' }
+      );
     });
 
     const headingElements = document.querySelectorAll('h1, .section-title h2');

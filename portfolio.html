@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sanchay Jasswal | Creative Portfolio</title>
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-2: #0f172a;
+      --surface: rgba(255,255,255,0.08);
+      --surface-strong: rgba(255,255,255,0.12);
+      --text: #f8fafc;
+      --muted: #9fb0c7;
+      --accent: #5eead4;
+      --accent-2: #818cf8;
+      --accent-3: #38bdf8;
+      --border: rgba(255,255,255,0.14);
+      --shadow: 0 25px 60px rgba(2, 8, 23, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(94, 234, 212, 0.16), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.16), transparent 28%),
+        linear-gradient(135deg, var(--bg), var(--bg-2) 55%, #111c34);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      width: min(1160px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(2, 6, 23, 0.72);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+
+    .brand {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 1.1rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .nav-links a {
+      padding: 0.35rem 0.5rem;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .hero {
+      padding: 5rem 0 4rem;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(94, 234, 212, 0.12);
+      color: #b9f7ef;
+      border: 1px solid rgba(94, 234, 212, 0.24);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.1rem, 4.4vw, 3.6rem);
+      line-height: 1.08;
+      margin: 0 0 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero h1 .accent {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero .lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 650px;
+      margin-bottom: 1.6rem;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.9rem 1.2rem;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(94, 234, 212, 0.18);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1.35rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.2rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .panel:hover {
+      transform: translateY(-3px);
+      border-color: rgba(94, 234, 212, 0.3);
+    }
+
+    .hero-card {
+      display: grid;
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -20% -30% auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(94, 234, 212, 0.28), transparent 70%);
+      filter: blur(18px);
+      pointer-events: none;
+    }
+
+    .profile-avatar {
+      width: 100%;
+      max-width: 260px;
+      aspect-ratio: 1;
+      margin: 0 auto;
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(94, 234, 212, 0.12), rgba(129, 140, 248, 0.12));
+      border: 1px solid rgba(255,255,255,0.12);
+      display: block;
+      position: relative;
+    }
+
+    .profile-avatar-img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      will-change: transform;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .hero-card .stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+    }
+
+    .hero-card .stat:last-child { border-bottom: 0; }
+    .hero-card .stat strong { color: var(--text); font-weight: 700; }
+
+    section { padding: 2.1rem 0 1rem; }
+
+    .section-title {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .about-grid, .project-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      margin-bottom: 0.45rem;
+      font-size: 1.05rem;
+    }
+    .edu-card { display:flex; gap:1rem; align-items:center; padding:1rem; border-radius:12px; background: rgba(255,255,255,0.03); border:1px solid var(--border); }
+    .edu-logo { width:64px; height:64px; border-radius:8px; overflow:hidden; flex:0 0 64px; background:#fff; display:grid; place-items:center; }
+    .edu-logo img { width:100%; height:100%; object-fit:contain; }
+    .edu-info h4 { margin:0 0 0.25rem; }
+    .edu-info p { margin:0; color:var(--muted); }
+
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.72rem;
+      margin-top: 0.8rem;
+    }
+
+    .skill-tag {
+      padding: 0.6rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(94, 234, 212, 0.13);
+      color: #c8f8f2;
+      font-size: 0.92rem;
+      font-weight: 600;
+      border: 1px solid rgba(94, 234, 212, 0.2);
+    }
+    .skill-tag { display: inline-flex; align-items: center; gap: 0.5rem; }
+    .skill-icon { width: 18px; height: 18px; display: inline-block; }
+
+    .game-link {
+      display: inline-block;
+      margin-top: 0.7rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .muted { color: var(--muted); }
+    .contact-note { margin-bottom: 1rem; }
+    /* avatar change button */
+    #avatar-change { font-size: 0.9rem; padding: 0.6rem; }
+
+    /* modal for skill info */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(2,6,23,0.6); display: none; align-items: center; justify-content: center; z-index: 60; }
+    .modal { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid var(--border); padding: 1.1rem; border-radius: 12px; max-width: 520px; color: var(--text); }
+    .modal h3 { margin: 0 0 0.5rem; }
+    .modal p { margin: 0; color: var(--muted); }
+
+    footer {
+      padding: 2rem 0 3rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 800px) {
+      .hero, .about-grid, .project-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero { padding-top: 3rem; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a class="brand" href="#"><span>SJ</span> PORTFOLIO</a>
+        <div class="nav-links">
+          <a href="#about">About</a>
+          <a href="#skills">Skills</a>
+          <a href="#games">Projects</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <p class="hero-badge">★ Creative developer • curious builder</p>
+        <h1>Building bold digital ideas with <span class="accent">creativity</span> and code.</h1>
+        <p class="lead">
+          I’m a young creator who loves turning simple ideas into polished web experiences, interactive games, and memorable projects that feel both fun and professional.
+        </p>
+        <div class="buttons">
+          <a class="btn btn-primary" href="#games">Explore My Projects</a>
+          <a class="btn btn-secondary" href="#contact">Get In Touch</a>
+        </div>
+      </div>
+
+      <div class="card hero-card">
+        <div class="profile-avatar">
+          <img class="profile-avatar-img" src="sanchay-photo.svg" alt="Sanchay" />
+        </div>
+        <input id="avatar-input" type="file" accept="image/*" style="display:none">
+        <button id="avatar-change" class="btn btn-secondary" style="margin-top:0.6rem; width:100%;">Change Photo</button>
+        <button id="avatar-save" class="btn btn-primary" style="margin-top:0.6rem; width:100%; display:none">Save Photo</button>
+        <div class="stat"><span>Name</span><strong>Sanchay Jasswal</strong></div>
+        <div class="stat"><span>Focus</span><strong>Creative Coding</strong></div>
+        <div class="stat"><span>Strength</span><strong>Fast Learning</strong></div>
+        <div class="stat"><span>Mindset</span><strong>Always Improving</strong></div>
+      </div>
+    </section>
+
+    <section id="education">
+      <h2 class="section-title">Education</h2>
+      <div class="panel edu-card">
+        <div class="edu-logo">
+          <img id="heritage-logo" src="icons/heritage.png" alt="The Heritage School" onerror="this.style.display='none'" />
+        </div>
+        <div class="edu-info">
+          <h4>The Heritage School</h4>
+          <p class="muted">Primary & Secondary education — focus on all-round learning and values.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <h2 class="section-title">About Me</h2>
+      <div class="grid about-grid">
+        <div class="panel">
+          <h3>Who I Am</h3>
+          <p class="muted">
+            I’m a young developer with a strong interest in building interactive experiences that are both visually appealing and easy to enjoy. I enjoy learning new tools, experimenting with ideas, and turning creative concepts into real projects.
+          </p>
+        </div>
+        <div class="panel">
+          <h3>What I Value</h3>
+          <p class="muted">
+            I believe in curiosity, discipline, and thoughtful design. I like creating work that feels polished, modern, and meaningful while keeping the experience fun and engaging for others.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills">
+      <h2 class="section-title">Core Skills</h2>
+      <div class="panel">1 
+
+        <div class="skills-list">
+          <span class="skill-tag" data-skill="html"><img class="skill-icon" src="icons/html.svg" alt="HTML">HTML</span>
+          <span class="skill-tag" data-skill="css"><img class="skill-icon" src="icons/css.svg" alt="CSS">CSS</span>
+          <span class="skill-tag" data-skill="js"><img class="skill-icon" src="icons/js.svg" alt="JavaScript">JavaScript</span>
+           <span class="skill-tag" data-skill="game"><img class="skill-icon" src="icons/game.svg" alt="Game">Game Design</span>
+           <span class="skill-tag" data-skill="creative"><img class="skill-icon" src="icons/creative.svg" alt="Creative">Creative Thinking</span>
+           <span class="skill-tag" data-skill="python"><img class="skill-icon" src="icons/python.svg" alt="Python">Python</span>
+           <span class="skill-tag" data-skill="problem"><img class="skill-icon" src="icons/puzzle.svg" alt="Problem">Problem Solving</span>
+           <span class="skill-tag" data-skill="learn"><img class="skill-icon" src="icons/learn.svg" alt="Learn">Fast Learning</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="games">
+      <h2 class="section-title">Featured Projects</h2>
+      <div class="grid project-grid">
+        <div class="panel game-card">
+          <h3>Memory Challenge</h3>
+          <p class="muted">A colorful matching game with clean visuals and a smooth, engaging experience.</p>
+          <a class="game-link" href="memory-game.html" target="_blank" rel="noopener noreferrer">Open Memory Game</a>
+        </div>
+        <div class="panel game-card">
+          <h3>Tic-Tac-Toe</h3>
+          <p class="muted">A clean and modern take on a classic game built for quick fun.</p>
+          <a class="game-link" href="tic-tac-toe.html" target="_blank" rel="noopener noreferrer">Open Tic-Tac-Toe</a>
+        </div>
+        <div class="panel game-card">
+          <h3>Table Tennis Arcade</h3>
+          <p class="muted">A lively browser game with fast action and a playful design style.</p>
+          <a class="game-link" href="table_tennis_game.html" target="_blank" rel="noopener noreferrer">Open Table Tennis</a>
+        </div>
+        <div class="panel game-card">
+          <h3>Personal Portfolio</h3>
+          <p class="muted">This page reflects my growing journey as a creator and web designer.</p>
+          <a class="game-link" href="portfolio.html" target="_blank" rel="noopener noreferrer">View Portfolio</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2 class="section-title">Contact</h2>
+      <div class="panel">
+        <p class="contact-note muted">If you’d like to talk, share ideas, or collaborate on a project, I’d love to hear from you.</p>
+        <div class="buttons">
+          <a class="btn btn-primary" href="mailto:sanchayalwaysprobothebest@gmail.com">Email Me</a>
+          <a class="btn btn-secondary" href="https://mail.google.com/mail/?view=cm&to=sanchayalwaysprobothebest@gmail.com" target="_blank" rel="noopener noreferrer">Open Gmail</a>
+          <a class="btn btn-secondary" href="https://outlook.live.com/mail/0/deeplink/compose?to=sanchayalwaysprobothebest@gmail.com" target="_blank" rel="noopener noreferrer">Open Outlook</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">© 2026 Sanchay Jasswal</div>
+  </footer>
+  <div id="skill-modal-backdrop" class="modal-backdrop">
+    <div class="modal" id="skill-modal">
+      <h3 id="skill-title">Title</h3>
+      <p id="skill-desc">Description</p>
+      <div style="text-align:right; margin-top:0.6rem;"><button id="skill-close" class="btn btn-secondary">Close</button></div>
+    </div>
+  </div>
+
+  <script>
+    // Avatar upload + simple crop to focus right side (approximate)
+    const avatarInput = document.getElementById('avatar-input');
+    const avatarBtn = document.getElementById('avatar-change');
+    const avatarImg = document.querySelector('.profile-avatar-img');
+
+    avatarBtn.addEventListener('click', () => avatarInput.click());
+
+    avatarInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+          // prepare draggable editor
+          const container = document.querySelector('.profile-avatar');
+          const cw = container.clientWidth;
+          const ch = container.clientHeight;
+          // store natural size
+          avatarImg.dataset.nw = img.naturalWidth;
+          avatarImg.dataset.nh = img.naturalHeight;
+          // set source and initial transform values
+          avatarImg.src = ev.target.result;
+          avatarImg.style.width = img.naturalWidth + 'px';
+          avatarImg.style.height = img.naturalHeight + 'px';
+          // compute scale to cover container
+          const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+          avatarImg.dataset.scale = scale;
+          // initial offsets to center image
+          let offsetX = (cw - img.naturalWidth * scale) / 2;
+          let offsetY = (ch - img.naturalHeight * scale) / 2;
+          avatarImg.dataset.offsetX = offsetX;
+          avatarImg.dataset.offsetY = offsetY;
+          avatarImg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+          document.getElementById('avatar-save').style.display = 'block';
+          // enable dragging
+          let dragging = false;
+          let lastX = 0, lastY = 0;
+          avatarImg.addEventListener('mousedown', (ev2) => {
+            dragging = true; lastX = ev2.clientX; lastY = ev2.clientY; avatarImg.style.cursor='grabbing';
+          });
+          window.addEventListener('mousemove', (ev2) => {
+            if (!dragging) return;
+            const dx = ev2.clientX - lastX, dy = ev2.clientY - lastY;
+            lastX = ev2.clientX; lastY = ev2.clientY;
+            offsetX = parseFloat(avatarImg.dataset.offsetX) + dx;
+            offsetY = parseFloat(avatarImg.dataset.offsetY) + dy;
+            avatarImg.dataset.offsetX = offsetX; avatarImg.dataset.offsetY = offsetY;
+            avatarImg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+          });
+          window.addEventListener('mouseup', () => { dragging = false; avatarImg.style.cursor='grab'; });
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Save cropped result from current transform
+    const avatarSave = document.getElementById('avatar-save');
+    avatarSave.addEventListener('click', () => {
+      const container = document.querySelector('.profile-avatar');
+      const cw = container.clientWidth;
+      const ch = container.clientHeight;
+      const nw = parseFloat(avatarImg.dataset.nw);
+      const nh = parseFloat(avatarImg.dataset.nh);
+      const scale = parseFloat(avatarImg.dataset.scale) || Math.max(cw / nw, ch / nh);
+      const offsetX = parseFloat(avatarImg.dataset.offsetX) || 0;
+      const offsetY = parseFloat(avatarImg.dataset.offsetY) || 0;
+      const sx = (-offsetX) / scale;
+      const sy = (-offsetY) / scale;
+      const sw = cw / scale;
+      const sh = ch / scale;
+      const imgObj = new Image();
+      imgObj.onload = function() {
+        const canvas = document.createElement('canvas');
+        canvas.width = cw; canvas.height = ch;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(imgObj, sx, sy, sw, sh, 0, 0, cw, ch);
+        avatarImg.src = canvas.toDataURL('image/png');
+        // reset transforms and hide save
+        avatarImg.style.width = '100%'; avatarImg.style.height = '100%'; avatarImg.style.transform = '';
+        document.getElementById('avatar-save').style.display = 'none';
+      };
+      imgObj.src = avatarImg.src;
+    });
+
+    // Skill modal
+    const skillMap = {
+      html: { title: 'HTML', desc: 'HTML (HyperText Markup Language) is the standard markup language for creating web pages. It structures content with elements like headings, paragraphs, links, and images.' },
+      css: { title: 'CSS', desc: 'CSS (Cascading Style Sheets) controls the presentation of web pages — layout, colors, fonts, and responsive design.' },
+      js: { title: 'JavaScript', desc: 'JavaScript is the programming language of the web. It enables interactivity, animations, and dynamic content on websites.' },
+      python: { title: 'Python', desc: 'Python is a versatile programming language used for web development, scripting, data science, and more. It is known for clear syntax and strong libraries.' },
+      game: { title: 'Game Design', desc: 'Game Des      Copy-Item "$env:USERPROFILE\Downloads\20160215_225337.jpg" -Destination "C:\Users\SANCHAY\Documents\my games\avatar.jpg"ign covers creating game rules, mechanics, levels, and user experiences that are fun, balanced, and engaging.' },
+      creative: { title: 'Creative Thinking', desc: 'Creative Thinking is about generating original ideas, experimenting, and combining concepts to build something new.' },
+      problem: { title: 'Problem Solving', desc: 'Problem Solving involves analysing situations, breaking problems down, and building practical solutions to technical challenges.' },
+      learn: { title: 'Fast Learning', desc: 'Fast Learning means quickly acquiring new skills and knowledge, adapting to feedback, and applying what you learn to real projects.' }
+    };
+
+    const backdrop = document.getElementById('skill-modal-backdrop');
+    const modalTitle = document.getElementById('skill-title');
+    const modalDesc = document.getElementById('skill-desc');
+    const closeBtn = document.getElementById('skill-close');
+
+    function showSkill(key) {
+      const info = skillMap[key];
+      if (!info) return;
+      modalTitle.textContent = info.title;
+      modalDesc.textContent = info.desc;
+      backdrop.style.display = 'flex';
+    }
+
+    closeBtn.addEventListener('click', () => backdrop.style.display = 'none');
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.style.display = 'none'; });
+
+    document.querySelectorAll('.skill-tag[data-skill]').forEach(el => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', () => showSkill(el.dataset.skill));
+    });
+  </script>
+</body>
+</html>
